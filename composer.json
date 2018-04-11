@@ -3,5 +3,10 @@
         "ramsey/uuid": "^3.7",
         "monolog/monolog": "^1.23",
         "pimple/pimple": "^3.0"
+    },
+    "autoload": {
+        "files":[
+            "src/"
+        ]
     }
 }
