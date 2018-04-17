@@ -6,5 +6,5 @@
  * Time: 下午6:48
  */
 return [
-    'RPC_SERVICE_DOMAIN' => 'yar',
+    'RPC_SERVICE_DOMAIN' => 'yarak',
 ];

@@ -6,8 +6,8 @@
  * Time: 下午5:39
  */
 $env = require_once 'env.php';
-$client = new Yar_Client("http://{$env['RPC_SERVICE_DOMAIN']}/rpc.php?controller=IndexController");
+$client = new Yar_Client("http://{$env['RPC_SERVICE_DOMAIN']}/rpc.php");
 $client->SetOpt(YAR_OPT_CONNECT_TIMEOUT, 5000);
 $client->SetOpt(YAR_OPT_HEADER, array("ak: val"));
-$result = $client->info($parameters = ['parameters'=>'chenbo']);
+$result = $client->info();
 var_dump($result);
