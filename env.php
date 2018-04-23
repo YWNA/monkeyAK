@@ -7,4 +7,7 @@
  */
 return [
     'RPC_SERVICE_DOMAIN' => 'yarak',
+    'MAPPING' => [
+        'ak' => 'AKService'
+    ]
 ];

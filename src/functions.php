@@ -7,7 +7,7 @@
  */
 if (!function_exists('env')){
     function env($key, $default_value = null){
-        $array = require_once '../env.php';
+        $array = require_once __DIR__.'/../env.php';
         if (isset($array[$key])){
             return $array[$key];
         } else {
