@@ -7,3 +7,7 @@ modules:
     enabled:
         - Asserts
         - \Helper\Unit
+        - Db:
+          dsn: 'mysql:host=localhost;dbname=testdb'
+          user: 'root'
+          password: 'root'
