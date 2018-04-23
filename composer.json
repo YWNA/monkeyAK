@@ -11,5 +11,8 @@
         "files":[
             "src/functions.php"
         ]
+    },
+    "require-dev": {
+        "codeception/codeception": "^2.4"
     }
 }
