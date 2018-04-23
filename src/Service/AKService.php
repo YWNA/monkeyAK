@@ -9,9 +9,10 @@
 namespace Monkey\Service;
 
 
-class AKService
+class AKService extends Service
 {
     public function info(){
+        $this->monolog->info(__FUNCTION__ . time());
         return __FUNCTION__ . time();
     }
 }
