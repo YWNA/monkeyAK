@@ -8,6 +8,6 @@ modules:
         - Asserts
         - \Helper\Unit
         - Db:
-            dsn: 'mysql:host=localhost;dbname=testdb'
+            dsn: 'mysql:host=localhost;dbname=monkey_test'
             user: 'root'
             password: 'root'

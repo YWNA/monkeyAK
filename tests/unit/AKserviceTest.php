@@ -18,7 +18,6 @@ class AKserviceTest extends \Codeception\Test\Unit
     // tests
     public function testSomeFeature()
     {
-        $this->tester->assertEquals(1,1);
-        $this->tester->seeInDatabase('users', array('name' => 'Davert', 'email' => 'davert@mail.com'));
+        $this->tester->haveInDatabase('access_secret_key', array('access_key' => 'Davert', 'secret_key' => 'davert', 'created_time' => time(), 'updated_time' => time()));
     }
 }
