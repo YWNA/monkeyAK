@@ -1,10 +1,16 @@
 <?php
 
 use Pimple\Container;
-
+$env = require_once './env.php';
+$env_test = require_once './env.test.php';
 $container = new Container();
-$container['db'] = function (){
-    $dbh = new PDO('mysql:dbname=testdb;host=127.0.0.1','root','root');
+$container['db'] = function () use($env) {
+    $dbh = new PDO("mysql:dbname={$env['db_name']};host={$env['host']}",$env['username'],$env['password']);
+    $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    return $dbh;
+};
+$container['db_test'] = function () use($env_test) {
+    $dbh = new PDO("mysql:dbname={$env_test['db_name']};host={$env_test['host']}",$env_test['username'],$env_test['password']);
     $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     return $dbh;
 };
