@@ -11,3 +11,5 @@ $client->SetOpt(YAR_OPT_CONNECT_TIMEOUT, 5000);
 $client->SetOpt(YAR_OPT_HEADER, array("ak: val"));
 $result = $client->info();
 var_dump($result);
+$result = $client->generate();
+var_dump($result);

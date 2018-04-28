@@ -17,7 +17,7 @@ class Kernel
             throw new \Exception('缺少Service参数');
         }
         $className = $this->getClassName($service);
-        $stdClass = "\\Monkey\\Service\\{$className}";
+        $stdClass = "\\Monkey\\Service\\Impl\\{$className}Impl";
         $instance = new $stdClass;
         $server = new \Yar_Server($instance);
         $server->handle();
