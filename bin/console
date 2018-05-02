@@ -1,0 +1,4 @@
+#!/usr/bin/env php
+<?php
+$application = require dirname(__DIR__).'/bootstrap/bootstrap_console.php';
+$application->run();
