@@ -9,11 +9,10 @@
 namespace Monkey\Command;
 
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class AKCommand extends Command
+class AKCommand extends BaseCommand
 {
     protected function configure()
     {
