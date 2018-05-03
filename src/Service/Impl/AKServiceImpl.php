@@ -39,7 +39,7 @@ class AKServiceImpl extends Service implements AKService
         $queryBuilder = $this->DBAL->createQueryBuilder();
 //        $queryBuilder->insert('access_secret_key')->values(['access_key' => $accessKey,'secret_key' => $secretKey]);
         $queryBuilder->insert('access_secret_key')
-            ->values(['access_key' => '?','secret_key' => '?'])
+            ->values(['access_key' => '?','secret_key' => '?', 'created_time' => time(), 'updated_time' => time()])
             ->setParameter(0, $accessKey)
             ->setParameter(1, $secretKey);
         $queryBuilder->execute();

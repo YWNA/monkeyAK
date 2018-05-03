@@ -23,7 +23,7 @@ class AKCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-
+        $this->container->monolog->info(__CLASS__);
         return;
     }
 }
