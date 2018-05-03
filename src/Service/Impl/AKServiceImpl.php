@@ -8,9 +8,6 @@
 
 namespace Monkey\Service\Impl;
 
-
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Tools\Setup;
 use Monkey\Service\AKService;
 use Monkey\Service\Service;
 use Ramsey\Uuid\Exception\UnsatisfiedDependencyException;
@@ -37,7 +34,6 @@ class AKServiceImpl extends Service implements AKService
         $secretKey = join('', explode('-', $secretKey->toString()));
 
         $queryBuilder = $this->DBAL->createQueryBuilder();
-//        $queryBuilder->insert('access_secret_key')->values(['access_key' => $accessKey,'secret_key' => $secretKey]);
         $queryBuilder->insert('access_secret_key')
             ->values(['access_key' => '?','secret_key' => '?', 'created_time' => time(), 'updated_time' => time()])
             ->setParameter(0, $accessKey)
@@ -47,20 +43,5 @@ class AKServiceImpl extends Service implements AKService
         $result = $this->DBAL->query($sql);
         $this->monolog->info(print_r($result->fetchAll(), true));
         return [$accessKey, $secretKey];
-    }
-
-    public function orm(){
-        $pathsArray = [
-            ROOT_DIR . 'src/Model'
-        ];
-        $isDevMode = false;
-        $dbConfig = [
-            'driver' => 'pdo_mysql',
-            'user' => env('MYSQL')['user'],
-            'password' => env('MYSQL')['password'],
-            'dbname' => env('MYSQL')['db_name']
-        ];
-
-        return ;
     }
 }
