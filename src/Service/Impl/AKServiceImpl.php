@@ -8,6 +8,7 @@
 
 namespace Monkey\Service\Impl;
 
+use Monkey\Model\Impl\AccessSecretKeyModelImpl;
 use Monkey\Service\AKService;
 use Monkey\Service\Service;
 use Ramsey\Uuid\Exception\UnsatisfiedDependencyException;
@@ -16,7 +17,7 @@ use Ramsey\Uuid\Uuid;
 class AKServiceImpl extends Service implements AKService
 {
     public function info(){
-        $this->monolog->info(__CLASS_);
+        $this->monolog->info(__FUNCTION__);
         return __FUNCTION__;
     }
 
@@ -33,15 +34,9 @@ class AKServiceImpl extends Service implements AKService
         $accessKey = join('', explode('-', $accessKey->toString()));
         $secretKey = join('', explode('-', $secretKey->toString()));
 
-        $queryBuilder = $this->DBAL->createQueryBuilder();
-        $queryBuilder->insert('access_secret_key')
-            ->values(['access_key' => '?','secret_key' => '?', 'created_time' => time(), 'updated_time' => time()])
-            ->setParameter(0, $accessKey)
-            ->setParameter(1, $secretKey);
-        $queryBuilder->execute();
-        $sql = "SELECT * FROM `access_secret_key`";
-        $result = $this->DBAL->query($sql);
-        $this->monolog->info(print_r($result->fetchAll(), true));
-        return [$accessKey, $secretKey];
+        $model = new AccessSecretKeyModelImpl();
+        $ret = $model->create(['access_key' => $accessKey, 'secret_key' => $secretKey]);
+
+        return [$accessKey, $secretKey, $ret];
     }
 }

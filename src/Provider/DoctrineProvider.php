@@ -10,7 +10,6 @@ namespace Monkey\Provider;
 
 
 use Doctrine\DBAL\Configuration;
-use Doctrine\DBAL\DriverManager;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 
@@ -19,14 +18,7 @@ class DoctrineProvider implements ServiceProviderInterface
     public function register(Container $pimple)
     {
         $config = new Configuration();
-        $connectionParams = array(
-            'dbname' => env('MYSQL')['db_name'],
-            'user' => env('MYSQL')['username'],
-            'password' => env('MYSQL')['password'],
-            'host' => env('MYSQL')['host'],
-            'driver' => 'pdo_mysql',
-        );
-        $pimple['DBAL'] = DriverManager::getConnection($connectionParams, $config);
+        $pimple['config'] = $config;
     }
 
 }
