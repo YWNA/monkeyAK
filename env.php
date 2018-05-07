@@ -17,6 +17,7 @@ return [
         'host' => '127.0.0.1',
         'username' => 'root',
         'password' => 'root',
-        'db_name' => 'monkey'
+        'db_name' => 'monkey',
+        'db_name_test' => 'monkey_test'
     ]
 ];
