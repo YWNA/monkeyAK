@@ -6,9 +6,10 @@ class AKserviceTest extends \Codeception\Test\Unit
      * @var \UnitTester
      */
     protected $tester;
-    
+
     protected function _before()
     {
+//        todo 单元测试时切换至测试数据库
     }
 
     protected function _after()
@@ -16,8 +17,11 @@ class AKserviceTest extends \Codeception\Test\Unit
     }
 
     // tests
-    public function testSomeFeature()
+    public function testGenerate()
     {
-        $this->tester->haveInDatabase('access_secret_key', array('access_key' => 'Davert', 'secret_key' => 'davert', 'created_time' => time(), 'updated_time' => time()));
+        $model = new \Monkey\Service\Impl\AKServiceImpl();
+        $ak = $model->generate();
+        $this->tester->assertNotEmpty($ak);
     }
+
 }

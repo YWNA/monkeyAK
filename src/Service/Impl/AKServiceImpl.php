@@ -35,8 +35,6 @@ class AKServiceImpl extends Service implements AKService
         $secretKey = join('', explode('-', $secretKey->toString()));
 
         $model = new AccessSecretKeyModelImpl();
-        $ret = $model->create(['access_key' => $accessKey, 'secret_key' => $secretKey]);
-
-        return [$accessKey, $secretKey, $ret];
+        return $model->create(['access_key' => $accessKey, 'secret_key' => $secretKey]);
     }
 }

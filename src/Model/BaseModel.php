@@ -16,21 +16,45 @@ class BaseModel extends Container
 {
     protected $db;
 
+    protected $table;
+
     public function __construct()
     {
         parent::__construct();
-        $connectionParams = array(
-            'dbname' => env('MYSQL')['db_name'],
-            'user' => env('MYSQL')['username'],
-            'password' => env('MYSQL')['password'],
-            'host' => env('MYSQL')['host'],
-            'driver' => 'pdo_mysql',
-        );
+        if ($this->isTest) {
+            $connectionParams = array(
+                'dbname' => env('MYSQL')['db_name_test'],
+                'user' => env('MYSQL')['username'],
+                'password' => env('MYSQL')['password'],
+                'host' => env('MYSQL')['host'],
+                'driver' => 'pdo_mysql',
+            );
+        } else {
+            $connectionParams = array(
+                'dbname' => env('MYSQL')['db_name'],
+                'user' => env('MYSQL')['username'],
+                'password' => env('MYSQL')['password'],
+                'host' => env('MYSQL')['host'],
+                'driver' => 'pdo_mysql',
+            );
+        }
         $this->db = DriverManager::getConnection($connectionParams, $this->config);
     }
 
-    public function create($table, $fields){
-        $this->db->insert($table, $fields);
+    public function create($fields){
+        $this->db->insert($this->table, $fields);
         return $this->db->lastInsertId();
+    }
+
+    public function updateById($id, $fields){
+        return $this->db->update($this->table, $fields, ['id'=>$id]);
+    }
+
+    public function updateByConditions($conditions, $fields){
+        return $this->db->update($this->table, $fields, $conditions);
+    }
+
+    public function getById($id){
+        return $this->db->createQueryBuilder()->select()->where(['id' => $id]);
     }
 }
