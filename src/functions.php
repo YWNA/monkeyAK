@@ -8,7 +8,7 @@
 define('ROOT_DIR', dirname(__DIR__) . DIRECTORY_SEPARATOR);
 if (!function_exists('env')){
     function env($key, $default_value = null){
-        $array = require __DIR__.'/../env.php';
+        $array = require ROOT_DIR . 'env.php';
         if (isset($array[$key])){
             return $array[$key];
         } else {
