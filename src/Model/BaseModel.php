@@ -9,6 +9,8 @@
 namespace Monkey\Model;
 
 
+use Doctrine\Common\Cache\RedisCache;
+use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\DriverManager;
 use Monkey\Container;
 
@@ -39,11 +41,24 @@ class BaseModel extends Container
             );
         }
         $this->db = DriverManager::getConnection($connectionParams, $this->config);
+        $cache = new RedisCache();
+        $redis = new \Redis();
+        $redis->connect('localhost', 6379);
+        $cache->setRedis($redis);
+        $connectionParamsRedis = array(
+            'dbname' => env('MYSQL')['db_name_test'],
+            'user' => env('MYSQL')['username'],
+            'password' => env('MYSQL')['password'],
+            'host' => env('MYSQL')['host'],
+            'driver' => 'pdo_mysql',
+        );
+        $this->dbRedis = DriverManager::getConnection($connectionParamsRedis, $this->config);
+        $this->dbRedis->getConfiguration()->setResultCacheImpl($cache);
     }
 
     public function create($fields){
         $this->db->insert($this->table, $fields);
-        return $this->db->lastInsertId();
+        return $this->getById($this->db->lastInsertId());
     }
 
     public function updateById($id, $fields){
@@ -55,6 +70,16 @@ class BaseModel extends Container
     }
 
     public function getById($id){
-        return $this->db->createQueryBuilder()->select()->where(['id' => $id]);
+        $sql = "SELECT * FROM `{$this->table}` WHERE id = ?";
+        return $this->select($sql, [$id]);
+    }
+
+    private function select($sql, $params, $lifetime = 3600 * 60 * 20)
+    {
+        $cache = new QueryCacheProfile($lifetime, $this->table . ':' . json_encode($params));
+        $stmt = $this->db->executeCacheQuery($sql, $params, [], $cache);
+        $data = $stmt->fetchAll();
+        $stmt->closeCursor();
+        return $data;
     }
 }
