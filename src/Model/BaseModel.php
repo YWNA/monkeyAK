@@ -78,6 +78,16 @@ class BaseModel extends Container
         return $this->select($sql, [$id]);
     }
 
+    public function getByWhere($where){
+        $sql = "SELECT id FROM `{$this->table}` WHERE {$where}";
+        $ids = $this->select($sql, $where);
+        $data = [];
+        foreach ($ids as $id){
+            array_push($data, $this->getById((int)$id['id']));
+        }
+        return $data;
+    }
+
     public function select($sql, $params, $lifetime = 3600 * 60 * 20)
     {
         $cache = new QueryCacheProfile($lifetime, $this->generateRedisId($params));
