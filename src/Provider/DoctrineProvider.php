@@ -9,6 +9,7 @@
 namespace Monkey\Provider;
 
 
+use Doctrine\Common\Cache\RedisCache;
 use Doctrine\DBAL\Configuration;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
@@ -19,6 +20,10 @@ class DoctrineProvider implements ServiceProviderInterface
     {
         $config = new Configuration();
         $pimple['config'] = $config;
+        $pimple['cache'] = new RedisCache();
+        $redis = new \Redis();
+        $redis->connect(env('REDIS')['host'], env('REDIS')['port']);
+        $pimple['cache']->setRedis($redis);
     }
 
 }

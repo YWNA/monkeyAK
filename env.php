@@ -19,5 +19,9 @@ return [
         'password' => 'root',
         'db_name' => 'monkey',
         'db_name_test' => 'monkey_test'
+    ],
+    'REDIS' => [
+        'host' => '127.0.0.1',
+        'port' => 6379
     ]
 ];

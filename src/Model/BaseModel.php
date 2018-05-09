@@ -9,7 +9,6 @@
 namespace Monkey\Model;
 
 
-use Doctrine\Common\Cache\RedisCache;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\DriverManager;
 use Monkey\Container;
@@ -41,19 +40,7 @@ class BaseModel extends Container
             );
         }
         $this->db = DriverManager::getConnection($connectionParams, $this->config);
-        $cache = new RedisCache();
-        $redis = new \Redis();
-        $redis->connect('localhost', 6379);
-        $cache->setRedis($redis);
-        $connectionParamsRedis = array(
-            'dbname' => env('MYSQL')['db_name_test'],
-            'user' => env('MYSQL')['username'],
-            'password' => env('MYSQL')['password'],
-            'host' => env('MYSQL')['host'],
-            'driver' => 'pdo_mysql',
-        );
-        $this->dbRedis = DriverManager::getConnection($connectionParamsRedis, $this->config);
-        $this->dbRedis->getConfiguration()->setResultCacheImpl($cache);
+        $this->db->getConfiguration()->setResultCacheImpl($this->cache);
     }
 
     public function create($fields){
