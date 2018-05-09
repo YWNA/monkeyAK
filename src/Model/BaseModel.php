@@ -45,15 +45,32 @@ class BaseModel extends Container
 
     public function create($fields){
         $this->db->insert($this->table, $fields);
-        return $this->getById($this->db->lastInsertId());
+        return $this->getById((int) $this->db->lastInsertId());
     }
 
     public function updateById($id, $fields){
-        return $this->db->update($this->table, $fields, ['id'=>$id]);
+        if ($this->db->update($this->table, $fields, ['id'=>$id])){
+            if ($this->cache->contains($this->generateRedisId([$id]))){
+                $this->cache->delete($this->generateRedisId([$id]));
+            }
+        }
+        return $this->getById($id);
     }
 
-    public function updateByConditions($conditions, $fields){
-        return $this->db->update($this->table, $fields, $conditions);
+    public function updateByWhere($where, $fields){
+        $sql = "SELECT id FROM `{$this->table}` WHERE {$where}";
+        $ids = $this->select($sql, $where);
+        $affectedNum = 0;
+        foreach ($ids as $id){
+            $id = (int)$id['id'];
+            if ($this->db->update($this->table, $fields, ['id'=>$id])){
+                if ($this->cache->contains($this->generateRedisId([$id]))){
+                    $this->cache->delete($this->generateRedisId([$id]));
+                }
+                $affectedNum++;
+            }
+        }
+        return $affectedNum;
     }
 
     public function getById($id){
@@ -61,12 +78,20 @@ class BaseModel extends Container
         return $this->select($sql, [$id]);
     }
 
-    private function select($sql, $params, $lifetime = 3600 * 60 * 20)
+    public function select($sql, $params, $lifetime = 3600 * 60 * 20)
     {
-        $cache = new QueryCacheProfile($lifetime, $this->table . ':' . json_encode($params));
-        $stmt = $this->db->executeCacheQuery($sql, $params, [], $cache);
+        $cache = new QueryCacheProfile($lifetime, $this->generateRedisId($params));
+        if (is_array($params)){
+            $stmt = $this->db->executeCacheQuery($sql, $params, [], $cache);
+        } else {
+            $stmt = $this->db->executeCacheQuery($sql, [], [], $cache);
+        }
         $data = $stmt->fetchAll();
         $stmt->closeCursor();
         return $data;
+    }
+
+    private function generateRedisId($params){
+        return $this->table . ':' . json_encode($params);
     }
 }
