@@ -45,7 +45,7 @@ class BaseModel extends Container
 
     public function create($fields){
         $this->db->insert($this->table, $fields);
-        return $this->getById((int) $this->db->lastInsertId());
+        return $this->getById($this->db->lastInsertId());
     }
 
     public function updateById($id, $fields){
@@ -74,8 +74,9 @@ class BaseModel extends Container
     }
 
     public function getById($id){
-        $sql = "SELECT * FROM `{$this->table}` WHERE id = ?";
-        return $this->select($sql, [$id]);
+        $id = (int)$id;
+        $sql = "SELECT * FROM `{$this->table}` WHERE id = {$id}";
+        return $this->select($sql, $id);
     }
 
     public function getByWhere($where){
@@ -83,19 +84,15 @@ class BaseModel extends Container
         $ids = $this->select($sql, $where);
         $data = [];
         foreach ($ids as $id){
-            array_push($data, $this->getById((int)$id['id']));
+            array_push($data, $this->getById($id['id']));
         }
         return $data;
     }
 
-    public function select($sql, $params, $lifetime = 3600 * 60 * 20)
+    public function select($sql, $cacheMark, $lifetime = 3600 * 60 * 20)
     {
-        $cache = new QueryCacheProfile($lifetime, $this->generateRedisId($params));
-        if (is_array($params)){
-            $stmt = $this->db->executeCacheQuery($sql, $params, [], $cache);
-        } else {
-            $stmt = $this->db->executeCacheQuery($sql, [], [], $cache);
-        }
+        $cache = new QueryCacheProfile($lifetime, $this->generateRedisId($cacheMark));
+        $stmt = $this->db->executeCacheQuery($sql, [], [], $cache);
         $data = $stmt->fetchAll();
         $stmt->closeCursor();
         return $data;
