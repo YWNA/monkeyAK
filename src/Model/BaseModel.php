@@ -50,38 +50,39 @@ class BaseModel extends Container
 
     public function updateById($id, $fields){
         if ($this->db->update($this->table, $fields, ['id'=>$id])){
-            if ($this->cache->contains($this->generateRedisId([$id]))){
-                $this->cache->delete($this->generateRedisId([$id]));
-            }
+            $this->refreshRedis($id);
         }
         return $this->getById($id);
     }
 
     public function updateByWhere($where, $fields){
         $sql = "SELECT id FROM `{$this->table}` WHERE {$where}";
-        $ids = $this->select($sql, $where);
+        $ids = $this->db->executeQuery($sql)->fetchAll();
         $affectedNum = 0;
         foreach ($ids as $id){
             $id = (int)$id['id'];
             if ($this->db->update($this->table, $fields, ['id'=>$id])){
-                if ($this->cache->contains($this->generateRedisId([$id]))){
-                    $this->cache->delete($this->generateRedisId([$id]));
-                }
+                $this->refreshRedis($id);
                 $affectedNum++;
+                $this->getById($id);
             }
         }
         return $affectedNum;
     }
 
     public function getById($id){
+        $lifetime = 3600 * 60 * 20;
         $id = (int)$id;
         $sql = "SELECT * FROM `{$this->table}` WHERE id = {$id}";
-        return $this->select($sql, $id);
+        $stmt = $this->db->executeCacheQuery($sql, [], [], new QueryCacheProfile($lifetime, $this->generateRedisId($id)));
+        $data = $stmt->fetchAll();
+        $stmt->closeCursor();
+        return $data;
     }
 
     public function getByWhere($where){
         $sql = "SELECT id FROM `{$this->table}` WHERE {$where}";
-        $ids = $this->select($sql, $where);
+        $ids = $this->db->executeQuery($sql);
         $data = [];
         foreach ($ids as $id){
             array_push($data, $this->getById($id['id']));
@@ -89,16 +90,22 @@ class BaseModel extends Container
         return $data;
     }
 
-    public function select($sql, $cacheMark, $lifetime = 3600 * 60 * 20)
+    public function select($sql, $id, $lifetime = 3600 * 60 * 20)
     {
-        $cache = new QueryCacheProfile($lifetime, $this->generateRedisId($cacheMark));
+        $cache = new QueryCacheProfile($lifetime, $this->generateRedisId($id));
         $stmt = $this->db->executeCacheQuery($sql, [], [], $cache);
         $data = $stmt->fetchAll();
         $stmt->closeCursor();
         return $data;
     }
 
-    private function generateRedisId($params){
-        return $this->table . ':' . json_encode($params);
+    private function generateRedisId($id){
+        return $this->table . ':' . $id;
+    }
+
+    private function refreshRedis($cacheId){
+        if ($this->cache->contains($this->generateRedisId($cacheId))){
+            $this->cache->delete($this->generateRedisId($cacheId));
+        }
     }
 }
