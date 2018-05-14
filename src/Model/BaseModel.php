@@ -45,7 +45,12 @@ class BaseModel extends Container
 
     public function create($fields){
         $this->db->insert($this->table, $fields);
-        return $this->getById($this->db->lastInsertId());
+        $row = $this->getById($this->db->lastInsertId());
+        if ($row){
+            return $row[0];
+        } else {
+            return $row;
+        }
     }
 
     public function updateById($id, $fields){

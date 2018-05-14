@@ -1,26 +1,12 @@
 <?php
-
-class AKServiceTest extends \Codeception\Test\Unit
+require_once 'BaseTest.php';
+class AKServiceTest extends BaseTest
 {
-    /**
-     * @var \UnitTester
-     */
-    protected $tester;
-    
-    protected function _before()
-    {
-    }
-
-    protected function _after()
-    {
-    }
-
     // tests
-    public function testSomeFeature()
+    public function testGenerate()
     {
         $service = new \Monkey\Service\Impl\AKServiceImpl();
         $data = $service->generate();
-//        $this->tester->seeInDatabase('access_secret_key', $data);
-        $this->tester->seeInDatabase('access_secret_key', ['access_key' => 'miles']);
+        $this->tester->seeInDatabase('access_secret_key', ['access_key' => $data['access_key']]);
     }
 }
