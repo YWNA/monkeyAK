@@ -85,9 +85,10 @@ class BaseModel extends Container
         return $data;
     }
 
-    public function getByWhere($where){
-        $sql = "SELECT id FROM `{$this->table}` WHERE {$where}";
-        $ids = $this->db->executeQuery($sql);
+    public function getByWhere($where, $param){
+        $ids = $this->db->executeQuery("SELECT id FROM {$this->table} WHERE {$where}", $param);
+//        $sql = "SELECT id FROM `{$this->table}` WHERE {$where}";
+//        $ids = $this->db->executeQuery($sql);
         $data = [];
         foreach ($ids as $id){
             array_push($data, $this->getById($id['id']));
