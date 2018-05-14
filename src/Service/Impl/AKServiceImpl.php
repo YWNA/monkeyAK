@@ -16,6 +16,14 @@ use Ramsey\Uuid\Uuid;
 
 class AKServiceImpl extends Service implements AKService
 {
+    private $model;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->model = new AccessSecretKeyModelImpl();
+    }
+
     public function info(){
         $this->monolog->info(__FUNCTION__);
         return __FUNCTION__;
@@ -36,5 +44,36 @@ class AKServiceImpl extends Service implements AKService
 
         $model = new AccessSecretKeyModelImpl();
         return $model->create(['access_key' => $accessKey, 'secret_key' => $secretKey]);
+    }
+
+    public function sign($accessKey, $data, $time)
+    {
+        $ak = $this->model->getByWhere("access_key = ?", [$accessKey]);
+        $info = json_encode([
+            'data' => $data,
+            'time' => $time
+        ], true);
+        $sign = hash_hmac('sha256', $info, $ak['secret_key']);
+//        $this->cache->save("sign:{$accessKey}", $sign);
+        $this->cache->save("sign:{$accessKey}", $ak['secret_key']);
+        return $sign;
+    }
+
+    public function checkSign($accessKey, $data, $time, $originSign)
+    {
+        if ($this->cache->contains("sign:{$accessKey}")){
+//            $originSign = $this->cache->fetch("sign:{$accessKey}");
+            $secretKey = $this->cache->fetch("sign:{$accessKey}:secret_key");
+            $info = [
+                'data' => $data,
+                'time' => $time,
+            ];
+            $sign = hash_hmac('sha256', json_encode($info), $secretKey);
+            var_dump($sign);
+            if ($originSign === $sign){
+                return true;
+            }
+        }
+        return false;
     }
 }
