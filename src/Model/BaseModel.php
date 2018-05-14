@@ -45,7 +45,12 @@ class BaseModel extends Container
 
     public function create($fields){
         $this->db->insert($this->table, $fields);
-        return $this->getById($this->db->lastInsertId());
+        $row = $this->getById($this->db->lastInsertId());
+        if ($row){
+            return $row[0];
+        } else {
+            return $row;
+        }
     }
 
     public function updateById($id, $fields){
@@ -80,9 +85,10 @@ class BaseModel extends Container
         return $data;
     }
 
-    public function getByWhere($where){
-        $sql = "SELECT id FROM `{$this->table}` WHERE {$where}";
-        $ids = $this->db->executeQuery($sql);
+    public function getByWhere($where, $param){
+        $ids = $this->db->executeQuery("SELECT id FROM {$this->table} WHERE {$where}", $param);
+//        $sql = "SELECT id FROM `{$this->table}` WHERE {$where}";
+//        $ids = $this->db->executeQuery($sql);
         $data = [];
         foreach ($ids as $id){
             array_push($data, $this->getById($id['id']));

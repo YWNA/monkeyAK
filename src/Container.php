@@ -38,6 +38,10 @@ class Container extends \Pimple\Container
         foreach ($this->providers as $provider){
             $this->register(new $provider);
         }
-        $this->isTest = false;
+        if (getenv('isTest')){
+            $this->isTest = getenv('isTest');
+        } else {
+            $this->isTest = false;
+        }
     }
 }
