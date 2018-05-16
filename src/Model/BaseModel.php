@@ -46,11 +46,7 @@ class BaseModel extends Container
     public function create($fields){
         $this->db->insert($this->table, $fields);
         $row = $this->getById($this->db->lastInsertId());
-        if ($row){
-            return $row[0];
-        } else {
-            return $row;
-        }
+        return $row;
     }
 
     public function updateById($id, $fields){
@@ -80,7 +76,7 @@ class BaseModel extends Container
         $id = (int)$id;
         $sql = "SELECT * FROM `{$this->table}` WHERE id = {$id}";
         $stmt = $this->db->executeCacheQuery($sql, [], [], new QueryCacheProfile($lifetime, $this->generateRedisId($id)));
-        $data = $stmt->fetchAll();
+        $data = $stmt->fetch();
         $stmt->closeCursor();
         return $data;
     }

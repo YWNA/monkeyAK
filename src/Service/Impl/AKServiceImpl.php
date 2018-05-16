@@ -8,6 +8,7 @@
 
 namespace Monkey\Service\Impl;
 
+use Codeception\Util\Debug;
 use Monkey\Model\Impl\AccessSecretKeyModelImpl;
 use Monkey\Service\AKService;
 use Monkey\Service\Service;
@@ -49,27 +50,29 @@ class AKServiceImpl extends Service implements AKService
     public function sign($accessKey, $data, $time)
     {
         $ak = $this->model->getByWhere("access_key = ?", [$accessKey]);
+        if (empty($ak)){
+            throw new \Exception('not exist');
+        }
+        $secretKey = $ak[0]['secret_key'];
+        $this->monolog->info(print_r($ak, true));
         $info = json_encode([
             'data' => $data,
             'time' => $time
         ], true);
-        $sign = hash_hmac('sha256', $info, $ak['secret_key']);
-//        $this->cache->save("sign:{$accessKey}", $sign);
-        $this->cache->save("sign:{$accessKey}", $ak['secret_key']);
+        $sign = hash_hmac('sha256', $info, $secretKey);
+        $this->cache->save("sign:{$accessKey}:secret_key", $secretKey);
         return $sign;
     }
 
     public function checkSign($accessKey, $data, $time, $originSign)
     {
-        if ($this->cache->contains("sign:{$accessKey}")){
-//            $originSign = $this->cache->fetch("sign:{$accessKey}");
+        if ($this->cache->contains("sign:{$accessKey}:secret_key")){
             $secretKey = $this->cache->fetch("sign:{$accessKey}:secret_key");
             $info = [
                 'data' => $data,
                 'time' => $time,
             ];
             $sign = hash_hmac('sha256', json_encode($info), $secretKey);
-            var_dump($sign);
             if ($originSign === $sign){
                 return true;
             }

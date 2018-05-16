@@ -10,11 +10,10 @@ $client = new Yar_Client("http://{$env['RPC_SERVICE_DOMAIN']}/rpc.php?service=ak
 $client->SetOpt(YAR_OPT_CONNECT_TIMEOUT, 5000);
 $client->SetOpt(YAR_OPT_HEADER, array("ak: val"));
 //$result = $client->info();
-//var_dump($result);
-//$result = $client->generate();
-//var_dump($result);
+$result = $client->generate();
+$accessKey = $result['access_key'];
 $time = time();
-$result = $client->sign('936a8538d00540db8e330db1899d64fb', ['chenbo'=>'chenbo'], $time);
+$result = $client->sign($accessKey, ['chenbo'=>'chenbo'], $time);
 var_dump($result);
-$result = $client->checkSign('936a8538d00540db8e330db1899d64fb', ['chenbo'=>'chenbo'], $time, $result);
+$result = $client->checkSign($accessKey, ['chenbo'=>'chenbo'], $time, $result);
 var_dump($result);
